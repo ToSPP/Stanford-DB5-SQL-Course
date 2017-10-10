@@ -1,0 +1,40 @@
+= SQL Social-Network Modification Exercises =
+
+#Q1
+It's time for the seniors to graduate. Remove all 12th graders from Highschooler. 
+
+Delete From Highschooler
+Where grade = 12
+
+--
+
+#Q2
+If two students A and B are friends, and A likes B but not vice-versa, remove the Likes tuple. 
+
+Delete From Likes
+Where ID1 in (Select F.ID1 From Friend F, Likes L Where F.ID1 = L.ID1 AND F.ID2 = L.ID2)
+AND ID1 not in
+(Select ID1
+From Likes
+Where ID1 in
+(Select F1.ID1 From Friend F1, Likes L1
+Where F1.ID1 = L1.ID1 AND F1.ID2 = L1.ID2 AND F1.ID1 < L1.ID2) OR
+ID2 in
+(Select F1.ID1 From Friend F1, Likes L1
+Where F1.ID1 = L1.ID1 AND F1.ID2 = L1.ID2 AND F1.ID1 < L1.ID2))
+
+--
+
+#Q3
+For all cases where A is friends with B, and B is friends with C, add a new friendship for the pair A and C. Do not add duplicate friendships, friendships that already exist, or friendships with oneself. (This one is a bit challenging; congratulations if you get it right.) 
+
+Insert Into Friend
+Select Distinct P.ID1, P.ID2
+From
+(Select F1.ID1, F2.ID2
+From Friend F1, Friend F2
+Where F1.ID2 = F2.ID1 AND F1.ID1 != F2.ID2) P
+Where Not Exists
+(Select F.ID1, F.ID2 From Friend F Where F.ID1 = P.ID1 AND F.ID2 = P.ID2)
+
+--

@@ -1,0 +1,48 @@
+= SQL Movie-Rating Modification Exercises =
+
+#Q1
+Add the reviewer Roger Ebert to your database, with an rID of 209. 
+
+Insert into Reviewer (rID, name)
+Values (209, 'Roger Ebert')
+
+--
+
+#Q2
+Insert 5-star ratings by James Cameron for all movies in the database. Leave the review date as NULL. 
+
+Insert Into Rating
+   Select 207 as rID, 101 as mID, 5 as stars, NULL as ratingDate
+   Union All
+   Select 207, 102, 5, NULL
+   Union All 
+   Select 207, 103, 5, NULL
+   Union All
+   Select 207, 104, 5, NULL
+   Union All
+   Select 207, 105, 5, NULL
+   Union All
+   Select 207, 106, 5, NULL
+   Union All
+   Select 207, 107, 5, NULL
+   Union All
+   Select 207, 108, 5, NULL;
+
+--
+
+#Q3
+For all movies that have an average rating of 4 stars or higher, add 25 to the release year. (Update the existing tuples; don't insert new tuples.) 
+
+Update Movie
+Set year = year + 25
+Where mID in (Select mID From Rating Group by mID Having avg(Stars) >= 4)
+
+--
+
+#Q4
+Remove all ratings where the movie's year is before 1970 or after 2000, and the rating is fewer than 4 stars. 
+
+Delete From Rating
+Where mID in (Select mID From Movie Where year < 1970 Or year > 2000) AND Stars < 4
+
+--

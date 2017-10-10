@@ -1,0 +1,64 @@
+= SQL Social-Network Query Exercises Extras =
+
+#Q1
+For every situation where student A likes student B, but student B likes a different student C, return the names and grades of A, B, and C. 
+
+Select H1.name, H1.grade, H2.name, H2.grade, H3.name, H3.grade
+From Likes L1, Likes L2, Highschooler H1, Highschooler H2, Highschooler H3
+Where L1.ID2 = L2.ID1 AND L1.ID1 != L2.ID2
+AND L1.ID1 = H1.ID AND L1.ID2 = H2.ID AND L2.ID2 = H3.ID
+
+--
+
+#Q2
+Find those students for whom all of their friends are in different grades from themselves. Return the students' names and grades. 
+
+Select name, grade
+From Highschooler
+Where ID not in 
+(Select Distinct H1.ID
+From Friend F1, Friend F2, Highschooler H1, Highschooler H2, Highschooler H3
+Where F1.ID1 = F2.ID1 AND F1.ID1 = H1.ID AND F1.ID2 = H2.ID AND F2.ID2 = H3.ID
+AND H1.grade = H2.grade AND (H2.grade = H3.grade OR H1.grade = H3.grade))
+
+--
+
+#Q3
+What is the average number of friends per student? (Your result should be just one number.) 
+
+Select avg(N)
+From
+(Select ID1, count(*) N
+From Friend
+Group by ID1)
+
+--
+
+#Q4
+Find the number of students who are either friends with Cassandra or are friends of friends of Cassandra. Do not count Cassandra, even though technically she is a friend of a friend. 
+
+Select count(F)
+From
+(Select Distinct F1.ID1 F
+From Friend F1, Friend F2
+Where F1.ID2 = F2.ID1 AND (F1.ID2 = '1709' OR F2.ID2 = '1709') AND F1.ID1 != '1709')
+
+--
+
+#Q5
+Find the name and grade of the student(s) with the greatest number of friends. 
+
+Select name, grade
+From Highschooler
+Where ID in
+(Select ID1
+From (Select ID1, count(*) N
+From Friend
+Group by ID1) Where N = 
+(Select max(N) M
+From 
+(Select ID1, count(*) N
+From Friend
+Group by ID1)))
+
+--
